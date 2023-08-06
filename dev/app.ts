@@ -1,5 +1,5 @@
 import { createApp } from '../src/app';
-import { testController } from './controller';
+import { testController } from './test.controller';
 
 const app = createApp();
 app.useControllers([testController]);
