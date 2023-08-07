@@ -3,6 +3,7 @@ import { useParams, useReq, useRes } from '../src/middlewares';
 import * as ts from './test.service';
 import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
+import { useBody } from '../src/middlewares/use-body';
 
 const as = useAsyncService(asyncService);
 
@@ -24,6 +25,14 @@ testController
     console.log(ctx.someId, ctx.url, !!ctx.req, !!ctx.res);
     console.log(as.f2());
     return { id: ctx.someId, url: ctx.url };
+  });
+
+testController
+  .post('/path/:id/:url')
+  .use(useBody<{ a: number; b: string }>())
+  .go((ctx) => {
+    console.log(`body ${JSON.stringify(ctx.body)}`);
+    return 'OK';
   });
 
 testController
