@@ -1,20 +1,5 @@
-export type AsyncService<T> = {
-  setup: Promise<T>;
-  instance: T | null;
-};
-
-export function createAsyncService<T>(fn: () => Promise<T>): AsyncService<T> {
-  const srv = { setup: fn(), instance: null };
-  srv.setup.then((value) => (srv.instance = value));
-  return srv;
-}
-
-class AsyncServiceError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AsyncServiceError';
-  }
-}
+import { AsyncService } from './async-service.interface';
+import { AsyncServiceError } from './async-service.error';
 
 export function useAsyncService<T>(srv: AsyncService<T>): T {
   return new Proxy(srv, {

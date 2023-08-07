@@ -1,14 +1,13 @@
 import Koa from 'koa';
-import { Controller } from './controller';
-
-export interface App {
-  kapp: Koa;
-  listen(port: number): this;
-  useControllers(controllers: Controller[]): this;
-}
+import { Controller } from '../controller';
+import { App } from './app.interface';
+import * as bodyParser from 'koa-bodyparser';
 
 export function createApp(): App {
   const app = new Koa();
+
+  app.use(bodyParser());
+
   return {
     kapp: app,
     listen(port: number) {

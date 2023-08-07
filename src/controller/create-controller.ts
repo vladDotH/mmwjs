@@ -1,22 +1,7 @@
 import * as Router from 'koa-router';
-import { Rewrite, RType } from './core';
-import { createRoute, RMiddleware, Route } from './route';
-
-export interface Controller<Ctx = object> {
-  router: Router;
-  path: string;
-  middlewares: RMiddleware<any, any>[];
-
-  use<V>(fn: RMiddleware<Ctx, V>): Controller<Rewrite<Ctx, V>>;
-
-  get(path: string): Route<Ctx>;
-  post(path: string): Route<Ctx>;
-  put(path: string): Route<Ctx>;
-  delete(path: string): Route<Ctx>;
-  patch(path: string): Route<Ctx>;
-  head(path: string): Route<Ctx>;
-  all(path: string): Route<Ctx>;
-}
+import { createRoute, RMiddleware } from '../route';
+import { Rewrite, RType } from '../core';
+import { Controller } from './controller.interface';
 
 export function createController(path?: string): Controller {
   const router = new Router({ prefix: path });
