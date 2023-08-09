@@ -40,7 +40,7 @@ export function createRoute(
         },
         // TODO after-handler middlewares
       );
-      console.log(`Method ${method} on ${path} connected`);
+      console.log(`Method ${method} on ${path} mounted`);
     },
   };
 }

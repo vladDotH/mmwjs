@@ -16,7 +16,7 @@ export function createApp(): App {
     },
     useControllers(controllers: Controller[]) {
       for (const c of controllers) {
-        console.log(`Controller on ${c.path} connected`);
+        console.log(`Controller on ${c.path} mounted`);
         app.use(c.router.routes());
       }
       return this;
