@@ -1,4 +1,4 @@
-import * as Router from 'koa-router';
+import Router from 'koa-router';
 import { createRoute, RMiddleware } from '../route';
 import { Rewrite, RType } from '../core';
 import { Controller } from './controller.interface';
