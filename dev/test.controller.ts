@@ -4,6 +4,7 @@ import * as ts from './test.service';
 import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
 import { useBody } from '../src/middlewares/use-body';
+import { innerController } from './inner-test.controller';
 
 const as = useAsyncService(asyncService);
 
@@ -44,3 +45,5 @@ testController
     console.log(ctx.id, ctx.url);
     return 'Hellow world 2';
   });
+
+testController.join(innerController, '/prefix');
