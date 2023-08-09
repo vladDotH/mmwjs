@@ -36,5 +36,17 @@ export function createController(path?: string): Controller {
     all(path: string) {
       return createRoute(RType.ALL, path, router, this.middlewares);
     },
+
+    join(ctrl: Controller, prefix: string) {
+      if (prefix) {
+        router.use(prefix, ctrl.router.routes());
+      } else {
+        router.use(ctrl.router.routes());
+      }
+      console.log(
+        `Inner controller with ${ctrl.path} mounted` +
+          (prefix ? ` in ${prefix} ` : ''),
+      );
+    },
   };
 }

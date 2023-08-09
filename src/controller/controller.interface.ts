@@ -16,4 +16,6 @@ export interface Controller<Ctx = object> {
   patch(path: string): Route<Ctx>;
   head(path: string): Route<Ctx>;
   all(path: string): Route<Ctx>;
+
+  join(controller: Controller, prefix?: string);
 }
