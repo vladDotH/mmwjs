@@ -2,6 +2,8 @@ import Koa from 'koa';
 import { Controller } from '../controller';
 import { App } from './app.interface';
 import bodyParser from 'koa-bodyparser';
+import { logger } from '../logger';
+import chalk from 'chalk';
 
 export function createApp(): App {
   const app = new Koa();
@@ -16,7 +18,7 @@ export function createApp(): App {
     },
     useControllers(controllers: Controller[]) {
       for (const c of controllers) {
-        console.log(`Controller on ${c.path} mounted`);
+        logger.info(chalk.green(`Controller on ${chalk.blue(c.path)} mounted`));
         app.use(c.router.routes());
       }
       return this;

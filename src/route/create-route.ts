@@ -2,7 +2,10 @@ import { Rewrite, RType } from '../core';
 import Router from 'koa-router';
 import { Context, Next } from 'koa';
 import { RMiddleware, Route } from './index';
+import { logger } from '../logger';
+import chalk from 'chalk';
 
+// Todo inverse route dependency from controller (pass callback to register route)
 export function createRoute(
   method: RType,
   path: string,
@@ -40,7 +43,13 @@ export function createRoute(
         },
         // TODO after-handler middlewares
       );
-      console.log(`Method ${method} on ${path} mounted`);
+      logger.info(
+        chalk.green(
+          `Method ${method.toUpperCase().padEnd(6)} on ${chalk.blue(
+            path,
+          )} mounted`,
+        ),
+      );
     },
   };
 }

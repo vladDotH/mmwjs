@@ -2,6 +2,8 @@ import Router from 'koa-router';
 import { createRoute, RMiddleware } from '../route';
 import { Rewrite, RType } from '../core';
 import { Controller } from './controller.interface';
+import { logger } from '../logger';
+import chalk from 'chalk';
 
 export function createController(path?: string): Controller {
   const router = new Router({ prefix: path });
@@ -43,9 +45,11 @@ export function createController(path?: string): Controller {
       } else {
         router.use(ctrl.router.routes());
       }
-      console.log(
-        `Inner controller with ${ctrl.path} mounted` +
-          (prefix ? ` in ${prefix} ` : ''),
+      logger.info(
+        chalk.green(
+          `Inner controller with ${chalk.blue(ctrl.path)} mounted` +
+            (prefix ? ` in ${chalk.blue(prefix)} ` : ''),
+        ),
       );
     },
   };
