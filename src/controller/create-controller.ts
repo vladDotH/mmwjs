@@ -1,9 +1,10 @@
 import Router from 'koa-router';
-import { createRoute, RMiddleware } from '../route';
+import { createRoute, RMiddleware, Route } from '../route';
 import { Rewrite, RType } from '../core';
 import { Controller } from './controller.interface';
 import { logger } from '../logger';
 import chalk from 'chalk';
+import { regRoute } from './reg-route';
 
 export function createController(path?: string): Controller {
   const router = new Router({ prefix: path });
@@ -18,25 +19,29 @@ export function createController(path?: string): Controller {
     },
 
     get(path: string) {
-      return createRoute(RType.GET, path, router, this.middlewares);
+      return createRoute(RType.GET, path, this.getReg());
     },
     post(path: string) {
-      return createRoute(RType.POST, path, router, this.middlewares);
+      return createRoute(RType.POST, path, this.getReg());
     },
     put(path: string) {
-      return createRoute(RType.PUT, path, router, this.middlewares);
+      return createRoute(RType.PUT, path, this.getReg());
     },
     delete(path: string) {
-      return createRoute(RType.DELETE, path, router, this.middlewares);
+      return createRoute(RType.DELETE, path, this.getReg());
     },
     patch(path: string) {
-      return createRoute(RType.PATCH, path, router, this.middlewares);
+      return createRoute(RType.PATCH, path, this.getReg());
     },
     head(path: string) {
-      return createRoute(RType.HEAD, path, router, this.middlewares);
+      return createRoute(RType.HEAD, path, this.getReg());
     },
     all(path: string) {
-      return createRoute(RType.ALL, path, router, this.middlewares);
+      return createRoute(RType.ALL, path, this.getReg());
+    },
+
+    getReg(this: Controller) {
+      return (route: Route) => regRoute(this, route);
     },
 
     join(ctrl: Controller, prefix: string) {

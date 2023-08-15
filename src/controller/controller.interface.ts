@@ -1,5 +1,5 @@
 import * as Router from 'koa-router';
-import { RMiddleware, Route } from '../route';
+import { RMiddleware, Route, RRegFn } from '../route';
 import { Rewrite } from '../core';
 
 export interface Controller<Ctx = object> {
@@ -16,6 +16,8 @@ export interface Controller<Ctx = object> {
   patch(path: string): Route<Ctx>;
   head(path: string): Route<Ctx>;
   all(path: string): Route<Ctx>;
+
+  getReg(): RRegFn;
 
   join(controller: Controller, prefix?: string);
 }
