@@ -19,7 +19,6 @@ export function regRoute(controller: Controller, route: Route) {
       (mw) => async (context: Context, next: Next) => {
         context.state = {
           ...context.state,
-          // TODO parallel async middlewares (before & after sync. MW-s)
           ...(await mw(context.state, context)),
         };
         return next();
