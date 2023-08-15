@@ -2,6 +2,7 @@ import { MMWLogMeta } from './log-meta.interface';
 import winston from 'winston';
 import process from 'process';
 import { DateTime } from 'luxon';
+import { levelColors } from './levels';
 
 type LogType = {
   message: string;
@@ -16,7 +17,7 @@ export const defaultFormat = winston.format.printf((info: LogType) => {
       timeStyle: 'short',
       dateStyle: 'short',
     })} ` +
-    `${info.level.toUpperCase().padEnd(7)} ` +
+    `${levelColors[info.level](info.level.toUpperCase().padEnd(7))} ` +
     `${info.message} ` +
     (info.tags ? `[${info.tags?.join('; ') ?? ''}]` : '')
   );
