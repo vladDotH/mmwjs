@@ -46,4 +46,9 @@ testController
     return 'Hellow world 2';
   });
 
+testController.get('/error').go((ctx) => {
+  throw new Error('Server Error!!!');
+  return 'Something';
+});
+
 testController.join(innerController, '/prefix');
