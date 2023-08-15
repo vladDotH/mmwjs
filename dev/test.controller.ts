@@ -5,6 +5,7 @@ import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
 import { useBody } from '../src/middlewares/use-body';
 import { innerController } from './inner-test.controller';
+import * as fs from 'fs';
 
 const as = useAsyncService(asyncService);
 
@@ -46,9 +47,23 @@ testController
     return 'Hellow world 2';
   });
 
-testController.get('/error').go((ctx) => {
-  throw new Error('Server Error!!!');
-  return 'Something';
+testController
+  .get('/error')
+  .use(() => {
+    return {
+      asyncData: new Promise<number>((resolve) => {
+        resolve(123);
+      }),
+    };
+  })
+  .go(async (ctx) => {
+    console.log('async middleware:', await ctx.asyncData);
+    throw new Error('Server Error!!!');
+    return 'Something';
+  });
+
+testController.get('/file').go(() => {
+  return fs.createReadStream('./package.json');
 });
 
 testController.join(innerController, '/prefix');
