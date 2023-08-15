@@ -18,6 +18,6 @@ export const defaultFormat = winston.format.printf((info: LogType) => {
     })} ` +
     `${info.level.toUpperCase().padEnd(7)} ` +
     `${info.message} ` +
-    (info.tags ? `[${info.tags?.join(';') ?? ''}]` : '')
+    (info.tags ? `[${info.tags?.join('; ') ?? ''}]` : '')
   );
 });
