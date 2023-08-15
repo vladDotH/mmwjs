@@ -12,14 +12,16 @@ export function createApp(): App {
 
   return {
     kapp: app,
+
     listen(port: number) {
       app.listen(port);
       return this;
     },
+
     useControllers(controllers: Controller[]) {
       for (const c of controllers) {
-        logger.info(chalk.green(`Controller on ${chalk.blue(c.path)} mounted`));
         app.use(c.router.routes());
+        logger.info(chalk.green(`Controller on ${chalk.blue(c.path)} mounted`));
       }
       return this;
     },
