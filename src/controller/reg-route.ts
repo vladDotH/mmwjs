@@ -4,8 +4,27 @@ import { Context, Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
 import { createErrorHandler } from './create-error-handler';
+import { RoutesCollisionError } from './routes-collision-error';
 
 export function regRoute(controller: Controller, route: Route) {
+  if (
+    controller.router.match(
+      `${controller.path}${route.path}`,
+      route.method.toUpperCase(),
+    ).pathAndMethod.length
+  ) {
+    const errMsg = chalk.red(
+      `Route ${chalk.magenta(
+        route.method.toUpperCase(),
+      )} already mounted in ${chalk.blue(route.path)}`,
+    );
+    logger.error(errMsg, {
+      tags: [`Controller ${chalk.blue(controller.path)}`],
+    });
+
+    throw new RoutesCollisionError(errMsg);
+  }
+
   const rMiddlewares = route.middlewares.slice(0, -1),
     handler = route.middlewares.slice(-1)[0];
 
