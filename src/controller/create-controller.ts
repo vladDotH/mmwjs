@@ -52,7 +52,7 @@ export function createController(path?: string): Controller {
       }
       logger.info(
         chalk.green(
-          `Inner controller with ${chalk.blue(ctrl.path)} mounted` +
+          `Controller   ${chalk.blue(ctrl.path)} mounted` +
             (prefix ? ` in ${chalk.blue(prefix)} ` : ''),
         ),
       );

@@ -21,7 +21,11 @@ export function createApp(): App {
     useControllers(controllers: Controller[]) {
       for (const c of controllers) {
         app.use(c.router.routes());
-        logger.info(chalk.green(`Controller on ${chalk.blue(c.path)} mounted`));
+        logger.info(
+          chalk.green(
+            `Controller   ${chalk.blue(c.path)} mounted in ${chalk.blue('/')}`,
+          ),
+        );
       }
       return this;
     },
