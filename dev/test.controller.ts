@@ -6,6 +6,8 @@ import { asyncService } from './async.service';
 import { useBody } from '../src/middlewares/use-body';
 import { innerController } from './inner-test.controller';
 import * as fs from 'fs';
+import createHttpError from 'http-errors';
+import { ClassSchema, JoiSchema, JoiType } from './validation';
 
 const as = useAsyncService(asyncService);
 
@@ -30,11 +32,19 @@ testController
   });
 
 testController
-  .post('/path/:id/:url')
-  .use(useBody<{ a: number; b: string }>())
+  .post('/path/:id/:url/class')
+  .use(useBody(ClassSchema))
   .go((ctx) => {
     console.log(`body ${JSON.stringify(ctx.body)}`);
-    return 'OK';
+    return `OK class: ${JSON.stringify(ctx.body)}`;
+  });
+
+testController
+  .post('/path/:id/:url/joi')
+  .use(useBody<JoiType>(JoiSchema))
+  .go((ctx) => {
+    console.log(`body ${JSON.stringify(ctx.body)}`);
+    return `OK joi: ${JSON.stringify(ctx.body)}`;
   });
 
 testController
@@ -58,7 +68,7 @@ testController
   })
   .go(async (ctx) => {
     console.log('async middleware:', await ctx.asyncData);
-    throw new Error('Server Error!!!');
+    throw createHttpError(418, 'Error!!!!!!!!!!!!!!!!!!!!');
     return 'Something';
   });
 
