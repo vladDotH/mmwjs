@@ -1,16 +1,16 @@
 import { AsyncService } from './async-service.interface';
 import { AsyncServiceError } from './async-service.error';
 
+function baseSrvGetSet(): never {
+  throw new AsyncServiceError('Uninitialized async service');
+}
+
 export function createAsyncService<T>(fn: () => Promise<T>): AsyncService<T> {
   const srv: AsyncService<T> = {
     setup: fn(),
     instance: null,
-    _get() {
-      throw new AsyncServiceError('Uninitialized async service');
-    },
-    _set() {
-      throw new AsyncServiceError('Uninitialized async service');
-    },
+    _get: baseSrvGetSet,
+    _set: baseSrvGetSet,
   };
 
   srv.setup.then((value) => {
