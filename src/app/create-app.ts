@@ -21,24 +21,33 @@ export function createApp(): App {
 
     useControllers(controllers: Controller[]) {
       const paths = new Set();
+      const errors = [];
       for (const c of controllers) {
         if (paths.has(c.path)) {
           const errMsg = chalk.red(
             `Controller on path ${chalk.blue(c.path)} already mounted`,
           );
           logger.error(errMsg);
-          throw new ControllersCollisionError(errMsg);
+          errors.push(c.path);
+        } else {
+          app.use(c.router.routes());
+          logger.info(
+            chalk.green(
+              `Controller   ${chalk.blue(c.path)} mounted in ${chalk.blue(
+                '/',
+              )}`,
+            ),
+          );
         }
-
-        app.use(c.router.routes());
-        logger.info(
-          chalk.green(
-            `Controller   ${chalk.blue(c.path)} mounted in ${chalk.blue('/')}`,
-          ),
-        );
-
         paths.add(c.path);
       }
+
+      if (errors.length) {
+        throw new ControllersCollisionError(
+          chalk.red(`Some controllers collided: ${errors.join(', ')}`),
+        );
+      }
+
       return this;
     },
   };
