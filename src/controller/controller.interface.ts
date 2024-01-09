@@ -19,5 +19,5 @@ export interface Controller<Ctx = object> {
 
   getReg(): RRegFn;
 
-  join(controller: Controller, prefix?: string);
+  join(controller: Controller, prefix?: string): this;
 }
