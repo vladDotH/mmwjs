@@ -53,9 +53,10 @@ export function createController(path?: string): Controller {
       logger.info(
         chalk.green(
           `Controller   ${chalk.blue(ctrl.path)} mounted` +
-            (prefix ? ` in ${chalk.blue(prefix)} ` : ''),
+            (prefix ? ` in ${chalk.blue(this.path + prefix)} ` : ''),
         ),
       );
+      return this;
     },
   };
 }
