@@ -1,22 +1,38 @@
 import { RMiddleware } from '../route';
-import { fromPairs, invert, isArray, keys, zipObject } from 'lodash';
+import { identity, isFunction, isString } from 'lodash';
 import { RouterContext } from 'koa-router';
+import { createPipe, PipeOrFn } from '../pipe';
 
-export function useParams<const K extends string>(
-  params: K[],
+export function useParam<const K extends string>(
+  key: K,
 ): RMiddleware<any, Record<K, string>>;
 
-export function useParams<K extends string, V extends string>(
-  params: Record<K, V>,
+export function useParam<const K extends string, T = string>(
+  key: K,
+  pipe: PipeOrFn<string, T>,
+): RMiddleware<any, Record<K, T>>;
+
+export function useParam<const K extends string>(
+  key: K,
+  paramKey: string,
 ): RMiddleware<any, Record<K, string>>;
 
-export function useParams(params: Record<string, string> | string[]) {
-  const invParams = isArray(params)
-    ? zipObject(params, params)
-    : invert(params);
+export function useParam<const K extends string, T = string>(
+  key: K,
+  paramKey: string,
+  pipe: PipeOrFn<string, T>,
+): RMiddleware<any, Record<K, T>>;
+
+export function useParam(
+  key: string,
+  paramOrPipe?: string | PipeOrFn<string, any>,
+  pipe?: PipeOrFn<string, any>,
+) {
+  const paramKey = isString(paramOrPipe) ? paramOrPipe : key;
+  const transform = createPipe(
+    pipe ?? (isFunction(paramOrPipe) ? paramOrPipe : identity),
+  );
   return (ctx: any, kctx: RouterContext) => {
-    return fromPairs(
-      keys(invParams).map((key) => [invParams[key], kctx.params[key]]),
-    );
+    return { [key]: transform(kctx.params[paramKey]) };
   };
 }

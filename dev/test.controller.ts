@@ -1,5 +1,5 @@
 import { createController } from '../src/controller';
-import { useParams, useReq, useRes } from '../src/middlewares';
+import { useKoaContextObj, useParam, useReq, useRes } from '../src/middlewares';
 import * as ts from './test.service';
 import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
@@ -8,11 +8,13 @@ import { innerController } from './inner-test.controller';
 import * as fs from 'fs';
 import createHttpError from 'http-errors';
 import { ClassSchema, JoiSchema, JoiType } from './validation';
+import { awaitService } from '../src/middlewares/await-service';
 
 const as = useAsyncService(asyncService);
 
 export const testController = createController('/test')
   .use(useReq())
+  .use(awaitService(asyncService))
   .use(async () => {
     await new Promise((resolve) => {
       setTimeout(() => resolve(123), 1000);
@@ -22,12 +24,15 @@ export const testController = createController('/test')
 
 testController
   .get('/path/:id/:url')
-  .use(useParams({ someId: 'id', url: 'url' }))
   .use(useRes())
+  .use(useParam('url', parseFloat))
+  .use(useParam('someId', 'id'))
+  .use(useKoaContextObj('query'))
   .go((ctx) => {
+    console.log('query: ', ctx.query);
     console.log('async:', ctx.asyncA, ctx.asyncB);
-    console.log(ctx.someId, ctx.url, !!ctx.req, !!ctx.res);
     console.log(as.f2());
+    console.log({ id: ctx.someId, url: ctx.url });
     return { id: ctx.someId, url: ctx.url };
   });
 
@@ -49,7 +54,8 @@ testController
 
 testController
   .get('/path2/:id/:url')
-  .use(useParams(['id', 'url']))
+  .use(useParam('id'))
+  .use(useParam('url'))
   .go((ctx) => {
     console.log(ts.f1());
     console.log('async:', ctx.asyncA, ctx.asyncB);
