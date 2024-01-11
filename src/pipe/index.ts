@@ -1,4 +1,4 @@
-type Fn<I = any, O = any> = (value: I) => O;
+import { Fn } from '../core';
 
 export interface Pipe<I = any, O = any> {
   (value: I): O;
