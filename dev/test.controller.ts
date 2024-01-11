@@ -9,6 +9,9 @@ import * as fs from 'fs';
 import createHttpError from 'http-errors';
 import { ClassSchema, JoiSchema, JoiType } from './validation';
 import { awaitService } from '../src/middlewares/await-service';
+import { validationPipe } from '../src/pipe/pipes/validation';
+import { useQuery } from '../src/middlewares/use-query';
+import Joi from 'joi';
 
 const as = useAsyncService(asyncService);
 
@@ -27,9 +30,12 @@ testController
   .use(useRes())
   .use(useParam('url', parseFloat))
   .use(useParam('someId', 'id'))
-  .use(useKoaContextObj('query'))
+  .use(useQuery('qa'))
+  .use(useQuery('queryB', 'qb', validationPipe(Joi.string())))
   .go((ctx) => {
-    console.log('query: ', ctx.query);
+    console.log('query qa: ', ctx.qa);
+    console.log('query B: ', ctx.queryB);
+
     console.log('async:', ctx.asyncA, ctx.asyncB);
     console.log(as.f2());
     console.log({ id: ctx.someId, url: ctx.url });
@@ -38,7 +44,7 @@ testController
 
 testController
   .post('/path/:id/:url/class')
-  .use(useBody(ClassSchema))
+  .use(useBody(validationPipe(ClassSchema)))
   .go((ctx) => {
     console.log(`body ${JSON.stringify(ctx.body)}`);
     return `OK class: ${JSON.stringify(ctx.body)}`;
@@ -46,7 +52,7 @@ testController
 
 testController
   .post('/path/:id/:url/joi')
-  .use(useBody<JoiType>(JoiSchema))
+  .use(useBody(validationPipe(JoiSchema)))
   .go((ctx) => {
     console.log(`body ${JSON.stringify(ctx.body)}`);
     return `OK joi: ${JSON.stringify(ctx.body)}`;

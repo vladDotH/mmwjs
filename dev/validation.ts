@@ -13,7 +13,7 @@ export interface JoiType {
   b: string;
 }
 
-export const JoiSchema = Joi.object({
+export const JoiSchema = Joi.object<{ a: number; b: number }>({
   a: Joi.number().required(),
   b: Joi.string().required(),
 });
