@@ -10,7 +10,7 @@ export function useParam<const K extends string>(
 export function useParam<const K extends string, T = string>(
   key: K,
   pipe: PipeOrFn<string, T>,
-): RMiddleware<any, Record<K, T>>;
+): RMiddleware<any, Record<K, Awaited<T>>>;
 
 export function useParam<const K extends string>(
   key: K,
@@ -21,7 +21,7 @@ export function useParam<const K extends string, T = string>(
   key: K,
   paramKey: string,
   pipe: PipeOrFn<string, T>,
-): RMiddleware<any, Record<K, T>>;
+): RMiddleware<any, Record<K, Awaited<T>>>;
 
 export function useParam(
   key: string,
@@ -32,7 +32,7 @@ export function useParam(
   const transform = createPipe(
     pipe ?? (isFunction(paramOrPipe) ? paramOrPipe : identity),
   );
-  return (ctx: any, kctx: RouterContext) => {
-    return { [key]: transform(kctx.params[paramKey]) };
+  return async (ctx: any, kctx: RouterContext) => {
+    return { [key]: await transform(kctx.params[paramKey]) };
   };
 }
