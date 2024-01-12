@@ -9,5 +9,5 @@ export interface Route<Ctx = object> {
   regFn: RRegFn;
 
   use<V>(fn: RMiddleware<Ctx, V>): Route<Rewrite<Ctx, V>>;
-  go(fn: (ctx: Ctx) => any);
+  go(fn: (ctx: Ctx) => any): void;
 }
