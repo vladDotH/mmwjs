@@ -6,7 +6,7 @@ import { asyncService } from './async.service';
 import { useBody } from '../src/middlewares/use-body';
 import { innerController } from './inner-test.controller';
 import * as fs from 'fs';
-import { ImATeapot } from 'http-errors';
+import { ImATeapot, InternalServerError } from 'http-errors';
 import { ClassSchema, JoiSchema } from './validation';
 import { awaitService } from '../src/middlewares/await-service';
 import { validationPipe } from '../src/pipe/pipes/validation';
@@ -88,5 +88,40 @@ testController
 testController.get('/file').go(() => {
   return fs.createReadStream('./package.json');
 });
+
+testController
+  .get('/intercept')
+  .use(async (ctx, kctx) => {
+    await kctx.next();
+    console.log(kctx.body);
+    kctx.body = 'Modified';
+  })
+  .go(() => {
+    return 'Hello world';
+  });
+
+testController
+  .get('/intercept-error')
+  .use(async (ctx, kctx) => {
+    try {
+      await kctx.next();
+    } catch (err) {
+      throw new InternalServerError('Intercepted error');
+    }
+  })
+  .go(() => {
+    console.log('error occured!!!');
+    throw new Error('Critical information');
+  });
+
+testController
+  .get('/intercept-end')
+  .use(async (ctx, kctx) => {
+    kctx.body = 'Early returned';
+    kctx.end();
+  })
+  .go(() => {
+    throw new Error('Some code');
+  });
 
 testController.join(innerController, '/prefix');
