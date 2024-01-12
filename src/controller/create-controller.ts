@@ -5,6 +5,9 @@ import { Controller } from './controller.interface';
 import { logger } from '../logger';
 import chalk from 'chalk';
 import { regRoute } from './reg-route';
+import { pathExists } from './util';
+import { RoutesCollisionError } from './routes-collision-error';
+import { chain } from 'lodash';
 
 export function createController(path?: string): Controller {
   const router = new Router({ prefix: path });
@@ -44,15 +47,58 @@ export function createController(path?: string): Controller {
       return (route: Route) => regRoute(this, route);
     },
 
-    join(ctrl: Controller, prefix: string) {
+    join(this: Controller, controller: Controller, prefix?: string) {
+      console.log(this.router.stack.map((s) => [s.path, s.methods]));
+      console.log(controller.router.stack.map((s) => [s.path, s.methods]));
       if (prefix) {
-        router.use(prefix, ctrl.router.routes());
+        if (pathExists(this, prefix)) {
+          const errMsg = chalk.red(
+            `Failed to join controller by prefix: route ${chalk.blue(
+              prefix,
+            )} is already in use`,
+          );
+          logger.error(errMsg, {
+            tags: [`Controller ${chalk.blue(this.path)}`],
+          });
+
+          throw new RoutesCollisionError(errMsg);
+        }
+
+        router.use(prefix, controller.router.routes());
       } else {
-        router.use(ctrl.router.routes());
+        const errors = chain(controller.router.stack)
+          .flatMap((route) =>
+            route.methods.map((method) => [route.path, method]),
+          )
+          .map((route) => {
+            const matches = this.router.match(route[0], route[1]);
+            if (matches.pathAndMethod.length) {
+              const errMsg = chalk.red(
+                `Failed to merge controllers: route [${chalk.magenta(
+                  route[1],
+                )}] ${chalk.blue(route[0])} is already in use`,
+              );
+              logger.error(errMsg, {
+                tags: [`Controller ${chalk.blue(this.path)}`],
+              });
+              return errMsg;
+            }
+          })
+          .compact()
+          .value();
+
+        if (errors.length) {
+          throw new RoutesCollisionError(
+            chalk.red(
+              `Some errors occurred during controllers merging: ${errors}`,
+            ),
+          );
+        }
+        router.use(controller.router.routes());
       }
       logger.info(
         chalk.green(
-          `Controller   ${chalk.blue(ctrl.path)} mounted` +
+          `Controller   ${chalk.blue(controller.path)} mounted` +
             (prefix ? ` in ${chalk.blue(this.path + prefix)} ` : ''),
         ),
       );
