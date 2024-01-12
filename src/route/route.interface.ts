@@ -1,9 +1,9 @@
-import { Rewrite, RType } from '../core';
+import { Path, Rewrite, RType } from '../core';
 import { RMiddleware, RRegFn } from './index';
 
 export interface Route<Ctx = object> {
   method: RType;
-  path: string;
+  path: Path;
   middlewares: RMiddleware<any, any>[];
 
   regFn: RRegFn;

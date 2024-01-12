@@ -1,6 +1,6 @@
 import Router from 'koa-router';
 import { createRoute, RMiddleware, Route } from '../route';
-import { Rewrite, RType } from '../core';
+import { Path, Rewrite, RType } from '../core';
 import { Controller } from './controller.interface';
 import { logger } from '../logger';
 import chalk from 'chalk';
@@ -9,7 +9,7 @@ import { pathExists } from './util';
 import { RoutesCollisionError } from './routes-collision-error';
 import { chain } from 'lodash';
 
-export function createController(path?: string): Controller {
+export function createController(path: Path): Controller {
   const router = new Router({ prefix: path });
   return {
     router,
@@ -21,25 +21,25 @@ export function createController(path?: string): Controller {
       return this;
     },
 
-    get(path: string) {
+    get(path: Path) {
       return createRoute(RType.GET, path, this.getReg());
     },
-    post(path: string) {
+    post(path: Path) {
       return createRoute(RType.POST, path, this.getReg());
     },
-    put(path: string) {
+    put(path: Path) {
       return createRoute(RType.PUT, path, this.getReg());
     },
-    delete(path: string) {
+    delete(path: Path) {
       return createRoute(RType.DELETE, path, this.getReg());
     },
-    patch(path: string) {
+    patch(path: Path) {
       return createRoute(RType.PATCH, path, this.getReg());
     },
-    head(path: string) {
+    head(path: Path) {
       return createRoute(RType.HEAD, path, this.getReg());
     },
-    all(path: string) {
+    all(path: Path) {
       return createRoute(RType.ALL, path, this.getReg());
     },
 
@@ -62,7 +62,7 @@ export function createController(path?: string): Controller {
           throw new RoutesCollisionError(errMsg);
         }
 
-        router.use(prefix, controller.router.routes());
+        this.router.use(prefix, controller.router.routes());
       } else {
         const errors = chain(controller.router.stack)
           .flatMap((route) =>
@@ -92,12 +92,12 @@ export function createController(path?: string): Controller {
             ),
           );
         }
-        router.use(controller.router.routes());
+        this.router.use(controller.router.routes());
       }
       logger.info(
         chalk.green(
           `Controller   ${chalk.blue(controller.path)} mounted` +
-            (prefix ? ` in ${chalk.blue(this.path + prefix)} ` : ''),
+            ` in ${chalk.blue(this.path + (prefix ?? ''))}`,
         ),
       );
       return this;

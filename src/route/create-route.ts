@@ -1,7 +1,7 @@
-import { Rewrite, RType } from '../core';
+import { Path, Rewrite, RType } from '../core';
 import { RMiddleware, Route, RRegFn } from './index';
 
-export function createRoute(method: RType, path: string, regFn: RRegFn): Route {
+export function createRoute(method: RType, path: Path, regFn: RRegFn): Route {
   return {
     method,
     path,

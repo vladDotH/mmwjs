@@ -5,6 +5,8 @@ export type PromiseOr<V> = V | Promise<V>;
 export type Fn<I = any, O = any> = (value: I) => O;
 export type ClassSchema<C> = { new (): C };
 
+export type Path = `/${string}`;
+
 export enum RType {
   GET = 'get',
   POST = 'post',
