@@ -1,6 +1,6 @@
 import { createPipe, Pipe } from '../index';
 import { BadRequest } from 'http-errors';
-import { isInteger, toLower, values } from 'lodash';
+import { isInteger, toLower, values, toString } from 'lodash';
 
 export function createParseIntPipe(radix = 10) {
   return createPipe(toString)
