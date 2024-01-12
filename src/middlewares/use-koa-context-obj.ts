@@ -1,4 +1,5 @@
 import { RouterContext } from 'koa-router';
+import { MWContext } from '../route';
 
 export function useKoaContextObj<
   const K extends keyof RouterContext,
@@ -6,11 +7,9 @@ export function useKoaContextObj<
   R = RouterContext[K],
 >(key: K, name?: N) {
   const kName = name ?? key;
-  return <T>(ctx: T, kctx: RouterContext) => {
+  return <T>(ctx: T, kctx: MWContext) => {
     return {
       [`${kName}`]: kctx[key],
-    } as N extends string
-      ? { [key in N]: RouterContext[K] }
-      : { [key in K]: R };
+    } as N extends string ? { [key in N]: MWContext[K] } : { [key in K]: R };
   };
 }

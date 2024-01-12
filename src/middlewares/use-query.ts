@@ -1,4 +1,4 @@
-import { RMiddleware } from '../route';
+import { MWContext, RMiddleware } from '../route';
 import { createPipe, PipeOrFn } from '../pipe';
 import { identity, isFunction, isString } from 'lodash';
 import { RouterContext } from 'koa-router';
@@ -32,7 +32,7 @@ export function useQuery(
   const transform = createPipe(
     pipe ?? (isFunction(paramOrPipe) ? paramOrPipe : identity),
   );
-  return async (ctx: any, kctx: RouterContext) => {
+  return async (ctx: any, kctx: MWContext) => {
     return { [key]: await transform(kctx.query[paramKey]) };
   };
 }

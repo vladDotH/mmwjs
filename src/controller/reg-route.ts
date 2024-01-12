@@ -1,5 +1,5 @@
 import { Controller } from './controller.interface';
-import { Route } from '../route';
+import { MWContext, Route } from '../route';
 import { Context, Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
@@ -32,11 +32,26 @@ export function regRoute(controller: Controller, route: Route) {
     // Controller & route MWs
     ...[...controller.middlewares, ...rMiddlewares].map(
       (mw) => async (context: Context, next: Next) => {
+        let callNext = false,
+          end = false;
+
+        context.next = () => {
+          if (!callNext) {
+            callNext = true;
+            return next();
+          }
+        };
+
+        context.end = () => {
+          end = true;
+        };
+
         context.state = {
           ...context.state,
-          ...(await mw(context.state, context)),
+          ...(await mw(context.state, context as MWContext)),
         };
-        return next();
+
+        if (!end && !callNext) return next();
       },
     ),
 
@@ -45,8 +60,8 @@ export function regRoute(controller: Controller, route: Route) {
       context.body = await handler(context.state, undefined);
       return next();
     },
-    // TODO after-handler middlewares
   );
+
   logger.info(
     chalk.green(
       `Route ${route.method.toUpperCase().padEnd(6)} ${chalk.blue(
