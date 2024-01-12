@@ -5,18 +5,14 @@ import { logger } from '../logger';
 import chalk from 'chalk';
 import { createErrorHandler } from './create-error-handler';
 import { RoutesCollisionError } from './routes-collision-error';
+import { pathExists } from './util';
 
 export function regRoute(controller: Controller, route: Route) {
-  if (
-    controller.router.match(
-      `${controller.path}${route.path}`,
-      route.method.toUpperCase(),
-    ).pathAndMethod.length
-  ) {
+  if (pathExists(controller, route)) {
     const errMsg = chalk.red(
-      `Route ${chalk.magenta(
-        route.method.toUpperCase(),
-      )} already mounted in ${chalk.blue(route.path)}`,
+      `Route [${chalk.magenta(route.method.toUpperCase())}] ${chalk.blue(
+        route.path,
+      )} already in use`,
     );
     logger.error(errMsg, {
       tags: [`Controller ${chalk.blue(controller.path)}`],
