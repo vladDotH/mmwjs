@@ -9,45 +9,50 @@ import { ControllersCollisionError } from './controllers-collision-error';
 export function createApp(): App {
   const app = new Koa();
 
+  const paths = new Set(),
+    errors: string[] = [];
+
   app.use(bodyParser());
 
   return {
     kapp: app,
 
     listen(port: number) {
-      app.listen(port);
-      return this;
-    },
-
-    useControllers(controllers: Controller[]) {
-      const paths = new Set();
-      const errors = [];
-      for (const c of controllers) {
-        if (paths.has(c.path)) {
-          const errMsg = chalk.red(
-            `Controller on path ${chalk.blue(c.path)} already mounted`,
-          );
-          logger.error(errMsg);
-          errors.push(c.path);
-        } else {
-          app.use(c.router.routes());
-          logger.info(
-            chalk.green(
-              `Controller   ${chalk.blue(c.path)} mounted in ${chalk.blue(
-                '/',
-              )}`,
-            ),
-          );
-        }
-        paths.add(c.path);
-      }
-
       if (errors.length) {
         throw new ControllersCollisionError(
           chalk.red(`Some controllers collided: ${errors.join(', ')}`),
         );
       }
 
+      app.listen(port);
+      return this;
+    },
+
+    useController(controller: Controller) {
+      if (paths.has(controller.path)) {
+        const errMsg = chalk.red(
+          `Controller on path ${chalk.blue(controller.path)} already mounted`,
+        );
+        logger.error(errMsg);
+        errors.push(controller.path);
+      } else {
+        app.use(controller.router.routes());
+        logger.info(
+          chalk.green(
+            `Controller   ${chalk.blue(
+              controller.path,
+            )} mounted in ${chalk.blue('/')}`,
+          ),
+        );
+
+        paths.add(controller.path);
+      }
+
+      return this;
+    },
+
+    useControllers(controllers: Controller[]) {
+      controllers.map(this.useController);
       return this;
     },
   };
