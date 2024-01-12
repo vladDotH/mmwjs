@@ -48,8 +48,6 @@ export function createController(path?: string): Controller {
     },
 
     join(this: Controller, controller: Controller, prefix?: string) {
-      console.log(this.router.stack.map((s) => [s.path, s.methods]));
-      console.log(controller.router.stack.map((s) => [s.path, s.methods]));
       if (prefix) {
         if (pathExists(this, prefix)) {
           const errMsg = chalk.red(
