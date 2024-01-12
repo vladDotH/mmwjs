@@ -1,17 +1,18 @@
 import { createController } from '../src/controller';
-import { useKoaContextObj, useParam, useReq, useRes } from '../src/middlewares';
+import { useParam, useReq, useRes } from '../src/middlewares';
 import * as ts from './test.service';
 import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
 import { useBody } from '../src/middlewares/use-body';
 import { innerController } from './inner-test.controller';
 import * as fs from 'fs';
-import createHttpError from 'http-errors';
-import { ClassSchema, JoiSchema, JoiType } from './validation';
+import { ImATeapot } from 'http-errors';
+import { ClassSchema, JoiSchema } from './validation';
 import { awaitService } from '../src/middlewares/await-service';
 import { validationPipe } from '../src/pipe/pipes/validation';
 import { useQuery } from '../src/middlewares/use-query';
 import Joi from 'joi';
+import { createParseFloatPipe } from '../src/pipe/pipes/parse';
 
 const as = useAsyncService(asyncService);
 
@@ -28,7 +29,7 @@ export const testController = createController('/test')
 testController
   .get('/path/:id/:url')
   .use(useRes())
-  .use(useParam('url', parseFloat))
+  .use(useParam('url', createParseFloatPipe()))
   .use(useParam('someId', 'id'))
   .use(useQuery('qa'))
   .use(useQuery('queryB', 'qb', validationPipe(Joi.string())))
@@ -80,7 +81,7 @@ testController
   })
   .go(async (ctx) => {
     console.log('async middleware:', await ctx.asyncData);
-    throw createHttpError(418, 'Error!!!!!!!!!!!!!!!!!!!!');
+    throw new ImATeapot('Error!!!!!!!!!!!!!!!!!!!!');
     return 'Something';
   });
 

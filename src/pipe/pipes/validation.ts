@@ -2,7 +2,7 @@ import { ClassSchema, Fn } from '../../core';
 import Joi from 'joi';
 import { createPipe, Pipe } from '../index';
 import { validate } from 'class-validator';
-import createHttpError from 'http-errors';
+import { BadRequest } from 'http-errors';
 
 export function validationPipe<C extends object>(
   schema: ClassSchema<C>,
@@ -18,7 +18,7 @@ export function validationPipe(
       try {
         return await schema.validateAsync(obj);
       } catch (err) {
-        throw createHttpError(400, err);
+        throw new BadRequest(err);
       }
     });
   } else {
@@ -29,7 +29,7 @@ export function validationPipe(
       }
       const res = await validate(validateObj);
       if (!res.length) return obj;
-      else throw createHttpError(400, JSON.stringify(res));
+      else throw new BadRequest(JSON.stringify(res));
     });
   }
 }
