@@ -4,13 +4,12 @@ import { App } from './app.interface';
 import bodyParser from 'koa-bodyparser';
 import { logger } from '../logger';
 import chalk from 'chalk';
-import { ControllersCollisionError } from './controllers-collision-error';
 
 export function createApp(): App {
   const app = new Koa();
 
   const paths = new Set(),
-    errors: string[] = [];
+    warnings: string[] = [];
 
   app.use(bodyParser());
 
@@ -18,9 +17,11 @@ export function createApp(): App {
     kapp: app,
 
     listen(port: number) {
-      if (errors.length) {
-        throw new ControllersCollisionError(
-          chalk.red(`Some controllers collided: ${errors.join(', ')}`),
+      if (warnings.length) {
+        logger.warn(
+          chalk.red(
+            `Some routes are collided! Make sure its not a mistake:\n`,
+          ) + chalk.blue(`${warnings.map((str) => `\t-> ${str}`).join('\n')}`),
         );
       }
 
@@ -29,24 +30,27 @@ export function createApp(): App {
     },
 
     useController(controller: Controller) {
-      if (paths.has(controller.path)) {
-        const errMsg = chalk.red(
-          `Controller on path ${chalk.blue(controller.path)} already mounted`,
-        );
-        logger.error(errMsg);
-        errors.push(controller.path);
-      } else {
-        app.use(controller.router.routes());
-        logger.info(
-          chalk.green(
-            `Controller   ${chalk.blue(
-              controller.path,
-            )} mounted in ${chalk.blue('/')}`,
-          ),
-        );
+      controller.router.stack.forEach((route) => {
+        if (paths.has(route.path)) {
+          const warnMsg = chalk.yellow(
+            `Path ${chalk.blue(route.path)} is already in use`,
+          );
+          warnings.push(route.path);
+          logger.warn(warnMsg, {
+            tags: [`Controller ${controller.path}`],
+          });
+        }
+        paths.add(route.path);
+      });
 
-        paths.add(controller.path);
-      }
+      app.use(controller.router.routes());
+      logger.info(
+        chalk.green(
+          `Controller   ${chalk.blue(controller.path)} mounted in ${chalk.blue(
+            '/',
+          )}`,
+        ),
+      );
 
       return this;
     },

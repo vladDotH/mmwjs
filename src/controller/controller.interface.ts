@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 import { RMiddleware, Route, RRegFn } from '../route';
-import { Path, Rewrite } from '../core';
+import { Path, Rewrite, StrongPath } from '../core';
 
 export interface Controller<Ctx = object> {
   router: Router;
@@ -19,5 +19,5 @@ export interface Controller<Ctx = object> {
 
   getReg(): RRegFn;
 
-  join(controller: Controller, prefix?: string): this;
+  join<P extends Path>(controller: Controller, prefix?: StrongPath<P>): this;
 }

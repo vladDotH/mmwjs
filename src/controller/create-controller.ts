@@ -1,15 +1,14 @@
 import Router from 'koa-router';
 import { createRoute, RMiddleware, Route } from '../route';
-import { Path, Rewrite, RType } from '../core';
+import { Path, Rewrite, RType, StrongPath } from '../core';
 import { Controller } from './controller.interface';
 import { logger } from '../logger';
 import chalk from 'chalk';
 import { regRoute } from './reg-route';
-import { pathExists } from './util';
-import { RoutesCollisionError } from './routes-collision-error';
-import { chain } from 'lodash';
 
-export function createController(path: Path): Controller {
+export function createController<P extends Path>(
+  path?: StrongPath<P>,
+): Controller {
   const router = new Router({ prefix: path });
   return {
     router,
@@ -47,51 +46,14 @@ export function createController(path: Path): Controller {
       return (route: Route) => regRoute(this, route);
     },
 
-    join(this: Controller, controller: Controller, prefix?: string) {
+    join<P extends Path>(
+      this: Controller,
+      controller: Controller,
+      prefix?: StrongPath<P>,
+    ) {
       if (prefix) {
-        if (pathExists(this, prefix)) {
-          const errMsg = chalk.red(
-            `Failed to join controller by prefix: route ${chalk.blue(
-              prefix,
-            )} is already in use`,
-          );
-          logger.error(errMsg, {
-            tags: [`Controller ${chalk.blue(this.path)}`],
-          });
-
-          throw new RoutesCollisionError(errMsg);
-        }
-
         this.router.use(prefix, controller.router.routes());
       } else {
-        const errors = chain(controller.router.stack)
-          .flatMap((route) =>
-            route.methods.map((method) => [route.path, method]),
-          )
-          .map((route) => {
-            const matches = this.router.match(route[0], route[1]);
-            if (matches.pathAndMethod.length) {
-              const errMsg = chalk.red(
-                `Failed to merge controllers: route [${chalk.magenta(
-                  route[1],
-                )}] ${chalk.blue(route[0])} is already in use`,
-              );
-              logger.error(errMsg, {
-                tags: [`Controller ${chalk.blue(this.path)}`],
-              });
-              return errMsg;
-            }
-          })
-          .compact()
-          .value();
-
-        if (errors.length) {
-          throw new RoutesCollisionError(
-            chalk.red(
-              `Some errors occurred during controllers merging: ${errors}`,
-            ),
-          );
-        }
         this.router.use(controller.router.routes());
       }
       logger.info(

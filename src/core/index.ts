@@ -6,6 +6,7 @@ export type Fn<I = any, O = any> = (value: I) => O;
 export type ClassSchema<C> = { new (): C };
 
 export type Path = `/${string}`;
+export type StrongPath<T extends Path> = '/' extends T ? never : T;
 
 export enum RType {
   GET = 'get',
