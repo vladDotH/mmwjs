@@ -4,11 +4,12 @@ import { App } from './app.interface';
 import bodyParser from 'koa-bodyparser';
 import { logger } from '../logger';
 import chalk from 'chalk';
+import { intersection, union } from 'lodash';
 
 export function createApp(): App {
   const app = new Koa();
 
-  const paths = new Set(),
+  const paths = new Map<string, string[]>(),
     warnings: string[] = [];
 
   app.use(bodyParser());
@@ -20,7 +21,7 @@ export function createApp(): App {
       if (warnings.length) {
         logger.warn(
           chalk.red(
-            `Some routes are collided! Make sure its not a mistake:\n`,
+            `Some routes are collided! Make sure it is not a mistake:\n`,
           ) + chalk.blue(`${warnings.map((str) => `\t-> ${str}`).join('\n')}`),
         );
       }
@@ -31,7 +32,9 @@ export function createApp(): App {
 
     useController(controller: Controller) {
       controller.router.stack.forEach((route) => {
-        if (paths.has(route.path)) {
+        const prevMethods = paths.get(route.path) ?? [];
+
+        if (intersection(route.methods, prevMethods).length) {
           const warnMsg = chalk.yellow(
             `Path ${chalk.blue(route.path)} is already in use`,
           );
@@ -40,7 +43,8 @@ export function createApp(): App {
             tags: [`Controller ${controller.path}`],
           });
         }
-        paths.add(route.path);
+
+        paths.set(route.path, union(route.methods, prevMethods));
       });
 
       app.use(controller.router.routes());
