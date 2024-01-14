@@ -32,7 +32,7 @@ export function useQuery(
   const transform = createPipe(
     pipe ?? (isFunction(paramOrPipe) ? paramOrPipe : identity),
   );
-  return async (ctx: any, kctx: MWContext) => {
-    return { [key]: await transform(kctx.query[paramKey]) };
+  return async (state: any, ctx: MWContext) => {
+    return { [key]: await transform(ctx.query[paramKey]) };
   };
 }

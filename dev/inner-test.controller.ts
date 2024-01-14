@@ -16,7 +16,7 @@ innerController.get('/test-inner').go(() => {
 innerController
   .get('/test-inner/:id')
   .use(useParam('id'))
-  .go((ctx) => {
-    console.log('inner: ', ctx.id);
-    return `Response from test-inner ${ctx.id}`;
+  .go((state) => {
+    console.log('inner: ', state.id);
+    return `Response from test-inner ${state.id}`;
   });

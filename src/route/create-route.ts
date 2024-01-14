@@ -13,7 +13,7 @@ export function createRoute(method: RType, path: Path, regFn: RRegFn): Route {
       return this;
     },
 
-    go(this: Route, fn: (ctx: any) => any) {
+    go(this: Route, fn: (state: any) => any) {
       this.middlewares.push(fn);
       this.regFn(this);
     },

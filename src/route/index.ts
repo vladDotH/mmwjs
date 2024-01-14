@@ -10,7 +10,7 @@ export interface MWContext extends KoaContext {
   end: () => void;
 }
 
-export type RMiddleware<T, V> = (ctx: T, kctx: MWContext) => PromiseOr<V>;
+export type RMiddleware<T, V> = (state: T, ctx: MWContext) => PromiseOr<V>;
 export type RRegFn = (route: Route) => void;
 
 export * from './route.interface';

@@ -32,7 +32,7 @@ export function useParam(
   const transform = createPipe(
     pipe ?? (isFunction(paramOrPipe) ? paramOrPipe : identity),
   );
-  return async (ctx: any, kctx: MWContext) => {
-    return { [key]: await transform(kctx.params[paramKey]) };
+  return async (state: any, ctx: MWContext) => {
+    return { [key]: await transform(ctx.params[paramKey]) };
   };
 }

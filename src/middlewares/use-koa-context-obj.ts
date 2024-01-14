@@ -7,9 +7,9 @@ export function useKoaContextObj<
   R = RouterContext[K],
 >(key: K, name?: N) {
   const kName = name ?? key;
-  return <T>(ctx: T, kctx: MWContext) => {
+  return <T>(state: T, ctx: MWContext) => {
     return {
-      [`${kName}`]: kctx[key],
+      [`${kName}`]: ctx[key],
     } as N extends string ? { [key in N]: MWContext[K] } : { [key in K]: R };
   };
 }
