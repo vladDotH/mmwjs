@@ -1,8 +1,11 @@
 import { PromiseOr } from '../core';
 import { Route } from './route.interface';
 import { RouterContext } from 'koa-router';
+import { Context } from 'koa';
 
-export interface MWContext extends RouterContext {
+export interface KoaContext extends Context, Omit<RouterContext, 'state'> {}
+
+export interface MWContext extends KoaContext {
   next: () => PromiseOr<void>;
   end: () => void;
 }

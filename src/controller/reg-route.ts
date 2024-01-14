@@ -1,26 +1,11 @@
 import { Controller } from './controller.interface';
-import { MWContext, Route } from '../route';
-import { Context, Next } from 'koa';
+import { KoaContext, MWContext, Route } from '../route';
+import { Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
 import { createErrorHandler } from './create-error-handler';
-import { RoutesCollisionError } from './routes-collision-error';
-import { pathExists } from './util';
 
 export function regRoute(controller: Controller, route: Route) {
-  if (pathExists(controller, route)) {
-    const errMsg = chalk.red(
-      `Route [${chalk.magenta(route.method.toUpperCase())}] ${chalk.blue(
-        route.path,
-      )} already in use`,
-    );
-    logger.error(errMsg, {
-      tags: [`Controller ${chalk.blue(controller.path)}`],
-    });
-
-    throw new RoutesCollisionError(errMsg);
-  }
-
   const rMiddlewares = route.middlewares.slice(0, -1),
     handler = route.middlewares.slice(-1)[0];
 
@@ -31,7 +16,7 @@ export function regRoute(controller: Controller, route: Route) {
 
     // Controller & route MWs
     ...[...controller.middlewares, ...rMiddlewares].map(
-      (mw) => async (context: Context, next: Next) => {
+      (mw) => async (context: KoaContext, next: Next) => {
         let callNext = false,
           end = false;
 

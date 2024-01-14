@@ -1,11 +1,11 @@
 import { Controller } from './controller.interface';
-import { Route } from '../route';
-import { Context, Next } from 'koa';
+import { KoaContext, Route } from '../route';
+import { Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
 
 export function createErrorHandler(controller: Controller, route: Route) {
-  return async (context: Context, next: Next) => {
+  return async (context: KoaContext, next: Next) => {
     try {
       await next();
     } catch (err) {
