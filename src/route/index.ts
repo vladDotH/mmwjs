@@ -8,6 +8,7 @@ export interface KoaContext extends Context, Omit<RouterContext, 'state'> {}
 export interface MWContext extends KoaContext {
   next: () => PromiseOr<void>;
   end: () => void;
+  terminated?: boolean;
 }
 
 export type RMiddleware<T, V> = (state: T, ctx: MWContext) => PromiseOr<V>;
