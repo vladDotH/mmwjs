@@ -3,14 +3,14 @@ import { useFiles, useParam, useReq, useRes } from '../src/middlewares';
 import * as ts from './test.service';
 import { useAsyncService } from '../src/service';
 import { asyncService } from './async.service';
-import { useBody } from '../src/middlewares/use-body';
+import { useBody } from '../src/middlewares';
 import { innerController } from './inner-test.controller';
 import * as fs from 'fs';
-import { BadRequest, ImATeapot, InternalServerError } from 'http-errors';
+import { ImATeapot, InternalServerError } from 'http-errors';
 import { ClassSchema, JoiSchema } from './validation';
-import { awaitService } from '../src/middlewares/await-service';
+import { awaitService } from '../src/middlewares';
 import { validationPipe } from '../src/pipe/pipes/validation';
-import { useQuery } from '../src/middlewares/use-query';
+import { useQuery } from '../src/middlewares';
 import Joi from 'joi';
 import { createParseFloatPipe } from '../src/pipe/pipes/parse';
 
@@ -130,6 +130,7 @@ testController
   .go((state) => {
     console.log('File:');
     console.log(state.file);
+    return `File: ${state.file?.originalname}`;
   });
 
 testController.join(innerController, '/prefix');
