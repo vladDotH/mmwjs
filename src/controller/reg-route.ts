@@ -1,9 +1,10 @@
 import { Controller } from './controller.interface';
-import { KoaContext, MWContext, Route } from '../route';
+import { MWContext, Route } from '../route';
 import { Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
-import { createErrorHandler } from './create-error-handler';
+import { createErrorHandler, terminatedHandler } from './error-handlers';
+import { noop } from 'lodash';
 
 export function regRoute(controller: Controller, route: Route) {
   const rMiddlewares = route.middlewares.slice(0, -1),
@@ -14,35 +15,35 @@ export function regRoute(controller: Controller, route: Route) {
 
     createErrorHandler(controller, route),
 
+    terminatedHandler,
+
     // Controller & route MWs
     ...[...controller.middlewares, ...rMiddlewares].map(
-      (mw) => async (context: KoaContext, next: Next) => {
-        let callNext = false,
-          end = false;
-
+      (mw) => async (context: MWContext, next: Next) => {
         context.next = () => {
-          if (!callNext) {
-            callNext = true;
-            return next();
-          }
+          const nextFn = next;
+          context.next = next = noop as Next;
+          return nextFn();
         };
 
         context.end = () => {
-          end = true;
+          context.terminated = true;
+          next = noop as Next;
         };
 
         context.state = {
           ...context.state,
-          ...(await mw(context.state, context as MWContext)),
+          ...(await mw(context.state, context)),
         };
 
-        if (!end && !callNext) return next();
+        return next();
       },
     ),
 
     // Final handler
-    async (context, next) => {
+    async (context: MWContext, next) => {
       context.body = await handler(context.state, undefined);
+      context.terminated = true;
       return next();
     },
   );

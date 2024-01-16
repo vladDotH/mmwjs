@@ -1,5 +1,5 @@
 import { Controller } from './controller.interface';
-import { KoaContext, Route } from '../route';
+import { KoaContext, MWContext, Route } from '../route';
 import { Next } from 'koa';
 import { logger } from '../logger';
 import chalk from 'chalk';
@@ -19,4 +19,16 @@ export function createErrorHandler(controller: Controller, route: Route) {
       context.body = err.message;
     }
   };
+}
+
+export async function terminatedHandler(ctx: MWContext, next: Next) {
+  await next();
+  if (!ctx.terminated) {
+    logger.warn(
+      `Request [${chalk.magenta(ctx.method)}] ` +
+        `${chalk.blue(ctx.path)} has not been terminated, ` +
+        `make sure you ${chalk.magenta('await')} or ` +
+        `${chalk.blue('return')} all next() handlers`,
+    );
+  }
 }
