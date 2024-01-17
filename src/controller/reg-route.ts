@@ -50,9 +50,8 @@ export function regRoute(controller: Controller, route: Route) {
 
   logger.info(
     chalk.green(
-      `Route ${route.method.toUpperCase().padEnd(6)} ${chalk.blue(
-        route.path,
-      )} mounted in ${chalk.blue(controller.path)}`,
+      `Route ${chalk.magenta(route.method.toUpperCase().padEnd(6))} ` +
+        `${chalk.blue(route.path)} mounted in ${chalk.blue(controller.path)}`,
     ),
   );
 }
