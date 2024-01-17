@@ -5,6 +5,7 @@ import bodyParser from 'koa-bodyparser';
 import { logger } from '../logger';
 import chalk from 'chalk';
 import { intersection, union } from 'lodash';
+import { AppPlugin } from './index';
 
 export function createApp(): App {
   const app = new Koa();
@@ -16,6 +17,11 @@ export function createApp(): App {
 
   return {
     kapp: app,
+
+    use(fn: AppPlugin) {
+      fn(this);
+      return this;
+    },
 
     listen(port: number) {
       if (warnings.length) {
