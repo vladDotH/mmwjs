@@ -13,6 +13,7 @@ import { validationPipe } from '../src/pipe/pipes/validation';
 import { useQuery } from '../src/middlewares';
 import Joi from 'joi';
 import { createParseFloatPipe } from '../src/pipe/pipes/parse';
+import { useSession } from '../src/middlewares/use-session';
 
 const as = useAsyncService(asyncService);
 
@@ -131,6 +132,15 @@ testController
     console.log('File:');
     console.log(state.file);
     return `File: ${state.file?.originalname}`;
+  });
+
+testController
+  .get('/session')
+  .use(useSession<{ views: number }>())
+  .go((state) => {
+    console.log(state.session);
+    state.session.views = (state.session.views ?? 0) + 1;
+    return `Hello! ${state.session.views}`;
   });
 
 testController.join(innerController, '/prefix');
