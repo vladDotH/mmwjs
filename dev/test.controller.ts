@@ -20,7 +20,7 @@ const as = useAsyncService(asyncService);
 export const testController = createController('/test')
   .use(useReq())
   .use(awaitService(asyncService))
-  .use(async () => {
+  .use(async (state, ctx) => {
     await new Promise((resolve) => {
       setTimeout(() => resolve(123), 1000);
     });
@@ -139,7 +139,7 @@ testController
   .use(useSession<{ views: number }>())
   .go((state) => {
     console.log(state.session);
-    state.session.views = (state.session.views ?? 0) + 1;
+    // state.session.views = (state.session.views ?? 0) + 1;
     return `Hello! ${state.session.views}`;
   });
 

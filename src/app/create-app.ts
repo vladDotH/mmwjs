@@ -33,6 +33,7 @@ export function createApp(): App {
       }
 
       app.listen(port);
+      logger.info(chalk.green(`App is listening on port ${port}`));
       return this;
     },
 
