@@ -14,8 +14,8 @@ describe('Controller GET', () => {
     expect(response.status).toEqual(200)
     expect(response.body.message).toEqual(initialControllerMessage.message)
   });
-  test('Get string', async () => {
-    const response = await supertest(host).get('/test/string').set('Accept', 'application/json')
+  test('Get primitive', async () => {
+    const response = await supertest(host).get('/test/primitive').set('Accept', 'application/json')
     expect(response.status).toEqual(200)
     expect(response.text).toEqual(initialControllerMessage.message)
   });
@@ -23,9 +23,51 @@ describe('Controller GET', () => {
 });
 
 describe('Controller POST', () => {
-  test('Controller POST', async () => {
-    const response = await supertest(host).post('/test')
+  test('Post primitive', async () => {
+    const message = "test"
+    const response = await supertest(host).post('/test').send(message)
     expect(response.status).toEqual(200)
-    expect(response.body.message).toEqual(initialControllerMessage.message)
+    expect(response.body.message).toEqual({message})
   });
+})
+
+describe('Controller PUT', () => {
+  test('Post primitive', async () => {
+    const message = "test"
+    const response = await supertest(host).put('/test').send(message)
+    expect(response.status).toEqual(200)
+    expect(response.body.message).toEqual({message})
+  });
+})
+
+
+describe('Controller HEAD ', () => {
+  test('Post primitive', async () => {
+    const message = "test"
+    const response = await supertest(host).post('/test').send(message)
+    expect(response.status).toEqual(200)
+    expect(response.body.message).toEqual({message})
+  });
+})
+
+
+
+describe('Controller DELETE', () => {
+  test('Post primitive', async () => {
+    const message = "test"
+    const response = await supertest(host).post('/test').send(message)
+    expect(response.status).toEqual(200)
+    expect(response.body.message).toEqual({message})
+  });
+})
+
+describe('Controller PATCH', () => {
+  test('Post primitive', async () => {
+    const message = "test"
+    const response = await supertest(host).post('/test').send(message)
+    expect(response.status).toEqual(200)
+    expect(response.body.message).toEqual({message})
+  });
+
+
 })

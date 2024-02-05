@@ -28,6 +28,13 @@ export const testController = createController('/test')
   });
 
 testController
+  .post('/test-post')
+  .use(useBody())
+  .go((state) => {
+    console.log(state.body);
+    return state.body;
+  });
+testController
   .get('/path/:id/:url')
   .use(useRes())
   .use(useParam('url', createParseFloatPipe()))

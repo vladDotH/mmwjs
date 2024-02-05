@@ -6,4 +6,4 @@ const app = createApp();
 
 app.use(useSessionPlugin(['secret'], { key: 'session-key' }));
 app.useControllers([testController]);
-app.listen(3000);
+app.listen(3001);

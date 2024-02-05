@@ -15,14 +15,15 @@ app.listen(3000);
 
 beforeAll(() => {
   testController = createController('/test')
-  testController.get('/string').go((state) => {
+  testController.get('/primitive').go((state) => {
     return initialControllerMessage.message
   })
   testController.get('/').go(() => {
     return initialControllerMessage
   })
   testController.post('/' ).use(useBody()).go((state) => {
-    return state.body
+    console.log("body", state.body)
+    return {message: state.body}
   })
   app.useControllers([testController]);
 })
