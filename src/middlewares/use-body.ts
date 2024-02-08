@@ -8,12 +8,12 @@ export function useAsyncBody<C = any>(
   pipe?: Pipe<any, Promise<C>>,
 ): RMiddleware<any, { body: Promise<C> }> {
   const fn = pipe ?? identity;
-  return (state, ctx) => ({ body: fn(ctx.body) });
+  return (state, ctx) => ({ body: fn(ctx.request.body) });
 }
 
 export function useBody<C = any>(
   pipe?: Pipe<any, C>,
 ): RMiddleware<any, { body: Awaited<C> }> {
   const fn = pipe ?? identity;
-  return async (state, ctx) => ({ body: await fn(ctx.body) });
+  return async (state, ctx) => ({ body: await fn(ctx.request.body) });
 }
